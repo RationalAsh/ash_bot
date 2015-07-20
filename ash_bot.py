@@ -2,13 +2,13 @@
 import telegram
 import time
 import subprocess
-from ash_bot import key
+from ash_bot_key import key
 
 bot = telegram.Bot(token=key)
 print bot.getMe()
 
 def getCurrentVolume():
-    vol_info = subprocess.call(['amixer', '-D', 'pulse', 'sget', 'Master'])
+    vol_info = subprocess.check_output(['amixer', '-D', 'pulse', 'sget', 'Master'])
     idx = vol_info.find('%')
     vol = vol_info[idx-2:idx]
     return vol
@@ -37,13 +37,13 @@ def decideAction(message):
                                           '--print-playing'])
     elif text == 'louder' or text == 'volume up':
         reply = 'Volume Increased\n'
-        reply += 'Volume is now at ' + getCurrentVolume()
         subprocess.call(['amixer', 'sset', 'Master', '5%+'])
+        reply += 'Volume is now at ' + getCurrentVolume()
 
     elif text == 'softer' or text == 'volume down':
         reply = 'Volume Decreased\n'
-        reply += 'Volume is now at '+ getCurrentVolume()
         subprocess.call(['amixer', 'sset', 'Master', '5%-'])
+        reply += 'Volume is now at '+ getCurrentVolume()
         
     elif text == 'mute':
         reply = 'Muted'
@@ -51,8 +51,8 @@ def decideAction(message):
 
     elif text == 'unmute':
         reply = 'Unmuted\n'
-        reply += 'Volume is now at ' + getCurrentVolume()
         subprocess.call(['amixer', '-D', 'pulse', 'sset', 'Master', '1+', 'unmute'])
+        reply += 'Volume is now at ' + getCurrentVolume()
 
     elif text == 'shuffle':
         reply = 'Queue shuffled'
