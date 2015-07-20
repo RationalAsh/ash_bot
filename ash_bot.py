@@ -7,6 +7,12 @@ from ash_bot import key
 bot = telegram.Bot(token=key)
 print bot.getMe()
 
+def getCurrentVolume():
+    vol_info = subprocess.call(['amixer', '-D', 'pulse', 'sget', 'Master'])
+    idx = vol_info.find('%')
+    vol = vol_info[idx-2:idx]
+    return vol
+
 def decideAction(message):
     text = message.lower().strip()
     reply = ''
@@ -31,12 +37,12 @@ def decideAction(message):
                                           '--print-playing'])
     elif text == 'louder' or text == 'volume up':
         reply = 'Volume Increased\n'
-        #reply += 'Volume is now at '
+        reply += 'Volume is now at ' + getCurrentVolume()
         subprocess.call(['amixer', 'sset', 'Master', '5%+'])
 
     elif text == 'softer' or text == 'volume down':
         reply = 'Volume Decreased\n'
-        #reply += 'Volume is now at '
+        reply += 'Volume is now at '+ getCurrentVolume()
         subprocess.call(['amixer', 'sset', 'Master', '5%-'])
         
     elif text == 'mute':
@@ -44,7 +50,8 @@ def decideAction(message):
         subprocess.call(['amixer', '-D', 'pulse', 'sset', 'Master', '1+', 'mute'])
 
     elif text == 'unmute':
-        reply = 'Unmuted'
+        reply = 'Unmuted\n'
+        reply += 'Volume is now at ' + getCurrentVolume()
         subprocess.call(['amixer', '-D', 'pulse', 'sset', 'Master', '1+', 'unmute'])
 
     elif text == 'shuffle':
