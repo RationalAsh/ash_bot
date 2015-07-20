@@ -4,7 +4,6 @@ import time
 import subprocess
 from ash_bot import key
 
-#key = '24908036:AAFQ1wyZxzdTpF9DZGhme0qCGEWpxEBx7_4'
 bot = telegram.Bot(token=key)
 print bot.getMe()
 
