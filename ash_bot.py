@@ -3,6 +3,8 @@ import telegram
 import time
 import subprocess
 from ash_bot_key import key
+import random
+import os
 
 bot = telegram.Bot(token=key)
 print bot.getMe()
@@ -66,6 +68,24 @@ def decideAction(message):
         reply = 'Now playing: '
         reply += subprocess.check_output(['rhythmbox-client', 
                                           '--print-playing'])
+    elif ('play' in text) and (len(text) > len('play')):
+        search_str = text[text.find('play')+len('play'):].strip()
+        #find /home/rationalash/Music/ -type f -name "*Owl*"
+        files = subprocess.check_output(['find', '/home/rationalash/Music', 
+                                        '-type', 'f', '-iname', "*"+search_str+"*"])
+        tracks_list = files.split('\n')
+        random_num = int(random.random()*len(tracks_list))
+        track_str = 'rhythmbox-client --play-uri='+'"'+tracks_list[random_num]+'"'
+        os.system(track_str)
+        #subprocess.call(['rhythmbox-client', track_str])
+        
+        reply = 'Now playing: '
+        reply += subprocess.check_output(['rhythmbox-client', 
+                                          '--print-playing'])
+        print '--play-uri='+'"'+tracks_list[random_num]+'"'
+        print search_str
+        print files
+
     return reply
 
 def decideResponse(update):
