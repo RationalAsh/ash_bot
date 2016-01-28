@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import telegram
+from telegram import Updater
 import time
 import subprocess
 from ash_bot_key import key
@@ -120,33 +121,13 @@ def decideResponse(update):
 
     return reply
 
-latest_id = 0
+def handle_response(bot, update):
+    reply = decideResponse(update)
+    bot.sendMessage(chat_id=update.message.chat_id, text=reply)
 
-while True:
-    latest_id = open('latest', 'r')
-    offset = int(latest_id.readline().strip())
-    latest_id.close()
-    
-    updates = bot.getUpdates(offset = offset + 1)
-    if updates:
-        for u in updates:
-            reply = decideResponse(u)
-            print reply
-            try:
-                print reply
-                bot.sendMessage(chat_id=u.message.chat_id, text=reply)
-            except:
-                bot.sendMessage(chat_id=u.message.chat_id, text="I can still handle only text. :/")
-                print reply
-
-            uid = u.update_id
-            if uid > offset:
-                offset = uid
-    else:
-        print "No updates"
-
-    print offset
-    latest_id = open('latest', 'w')
-    latest_id.write(str(offset))
-    latest_id.close()
-    time.sleep(1)
+updater = Updater(token=key)
+dispatcher = updater.dispatcher
+dispatcher.addTelegramMessageHandler(handle_response)
+updater.start_polling(3.0)
+time.sleep(120)
+updater.stop()
